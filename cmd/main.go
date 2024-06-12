@@ -25,6 +25,8 @@ func main() {
 	r.HandleFunc("/api/v1/posts/{id}", controllers.GetPost).Methods("GET")
 	r.HandleFunc("/api/v1/posts/{title}", controllers.GetPostByTitle).Methods("GET")
 	r.HandleFunc("/api/v1/posts/{id}/comments", controllers.CreateComment).Methods("POST")
+	r.HandleFunc("/api/v1/most-posted-user", controllers.MostPostedUser).Methods("GET")
+	r.HandleFunc("/api/v1/most-liked-posts", controllers.TenMostPopularPosts).Methods("GET")
 
 	// Middleware
 	r.Use(middlewares.AuthMiddleware)

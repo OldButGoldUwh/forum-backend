@@ -9,16 +9,6 @@ import (
 	"net/http"
 )
 
-// CreateUser godoc
-// @Summary Create a new user
-// @Description Create a new user with the input payload
-// @Tags users
-// @Accept  json
-// @Produce  json
-// @Param user body models.User true "Create user"
-// @Success 201 {object} models.User
-// @Failure 400 {string} string "Bad request"
-// @Router /users [post]
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -26,9 +16,24 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if user.Username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+	if user.Email == "" {
+		http.Error(w, "Email is required", http.StatusBadRequest)
+		return
+	}
+	if user.Password == "" {
+		http.Error(w, "Password is required", http.StatusBadRequest)
+		return
+	}
+
 	err := services.CreateUser(&user)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 		return
 	}
 
@@ -36,17 +41,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-// LoginUser godoc
-// @Summary Login a user
-// @Description Login a user with the input payload
-// @Tags users
-// @Accept  json
-// @Produce  json
-// @Param user body models.User true "Login user"
-// @Success 200 {object} map[string]string{"token": "string"}
-// @Failure 400 {string} string "Bad request"
-// @Failure 401 {string} string "Unauthorized"
-// @Router /users/login [post]
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -74,4 +68,15 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(users)
+}
+
+func MostPostedUser(w http.ResponseWriter, r *http.Request) {
+	user, err := services.MostPostedUser()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
 }
