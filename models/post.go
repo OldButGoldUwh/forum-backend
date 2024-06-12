@@ -8,4 +8,8 @@ type Post struct {
 	Content    string   `json:"content"`
 	Categories []string `json:"categories"`
 	UserID     int      `json:"user_id"`
+	Likes      int      `json:"likes"`
+	Dislikes   int      `json:"dislikes"`
+	CreatedAt  string   `json:"created_at"`
+	UpdatedAt  string   `json:"updated_at"`
 }

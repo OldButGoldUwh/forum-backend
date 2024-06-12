@@ -36,3 +36,12 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(comment)
 }
+
+func GetComments(w http.ResponseWriter, r *http.Request) {
+	comments, err := services.GetComments()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(comments)
+}

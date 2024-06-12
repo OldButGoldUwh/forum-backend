@@ -65,3 +65,36 @@ func GetPostByTitle(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(post)
 }
+
+func TenMostPopularPosts(w http.ResponseWriter, r *http.Request) {
+	posts, err := services.TenMostPopularPosts()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(posts)
+}
+
+func MostLikedPost(w http.ResponseWriter, r *http.Request) {
+	post, err := services.MostLikedPost()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
+}
+
+func RecentTopic(w http.ResponseWriter, r *http.Request) {
+	post, err := services.RecentTopic()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
+}
