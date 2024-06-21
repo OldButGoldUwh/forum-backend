@@ -38,15 +38,30 @@ func createTables() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
-        user_id INTEGER NOT NULL
+        user_id INTEGER NOT NULL,
+		categories TEXT NOT NULL,
+        likes INTEGER NOT NULL,
+        dislikes INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
     );`
 
 	commentTable := `CREATE TABLE IF NOT EXISTS comments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         post_id INTEGER NOT NULL,
         content TEXT NOT NULL,
-        user_id INTEGER NOT NULL
+        user_id INTEGER NOT NULL,
+		created_at TEXT NOT NULL
     );`
+
+	likeTable := `CREATE TABLE IF NOT EXISTS likes (
+	    id INTEGER PRIMARY KEY AUTOINCREMENT,
+        post_id INTEGER,
+        user_id INTEGER NOT NULL,
+		comment_id INTEGER,
+		like BOOl NOT NULL,
+		created_at TEXT NOT NULL
+	);`
 
 	_, err := db.Exec(userTable)
 	if err != nil {
@@ -59,6 +74,11 @@ func createTables() {
 	}
 
 	_, err = db.Exec(commentTable)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = db.Exec(likeTable)
 	if err != nil {
 		log.Fatal(err)
 	}

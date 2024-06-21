@@ -7,12 +7,21 @@ import (
 	"forum-backend/utils"
 )
 
-func CreatePost(post *models.Post) error {
-	// authMiddleware'de token kontrolü yapılacak
+func CreatePost(post *models.Post, userId int) error {
 
 	db := utils.GetDB()
+	post.CreatedAt = utils.GetCurrentTime()
+	categories := ""
 
-	_, err := db.Exec("INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)", post.Title, post.Content)
+	for i, category := range post.Categories {
+		if i == 0 {
+			categories = category
+		} else {
+			categories = categories + "," + category
+		}
+	}
+
+	_, err := db.Exec("INSERT INTO posts (title, content, user_id, categories,likes, dislikes, created_at, updated_at ) VALUES (?, ?, ?, ?,?,?,?,?)", post.Title, post.Content, userId, categories, 0, 0, post.CreatedAt, post.CreatedAt)
 	return err
 }
 
@@ -33,6 +42,12 @@ func GetPosts() ([]models.Post, error) {
 		posts = append(posts, post)
 	}
 	return posts, nil
+}
+
+func EditPost(post *models.Post) error {
+	db := utils.GetDB()
+	_, err := db.Exec("UPDATE posts SET title =?, content =?, updated_at =? WHERE id =?", post.Title, post.Content, utils.GetCurrentTime(), post.ID)
+	return err
 }
 
 func GetPost(id int) (*models.Post, error) {
@@ -92,4 +107,52 @@ func RecentTopic() (models.Post, error) {
 		return models.Post{}, err
 	}
 	return post, nil
+}
+
+func UpdatePostUpdatedAt(postId int) error {
+	db := utils.GetDB()
+	currentTime := utils.GetCurrentTime()
+	_, err := db.Exec("UPDATE posts SET updated_at =? WHERE id =?", currentTime, postId)
+	return err
+
+}
+
+func UpdatePostLikes(postId int) error {
+	db := utils.GetDB()
+	_, err := db.Exec("UPDATE posts SET likes = likes + 1 WHERE id =?", postId)
+	return err
+}
+
+func UpdatePostDislikes(postId int) error {
+	db := utils.GetDB()
+	_, err := db.Exec("UPDATE posts SET dislikes = dislikes + 1 WHERE id =?", postId)
+	return err
+}
+
+func DeletePostLikes(postId int) error {
+	db := utils.GetDB()
+	_, err := db.Exec("UPDATE posts SET likes = likes - 1 WHERE id =?", postId)
+	return err
+}
+
+func DeletePostDislikes(postId int) error {
+	db := utils.GetDB()
+	_, err := db.Exec("UPDATE posts SET dislikes = dislikes - 1 WHERE id =?", postId)
+	return err
+}
+
+func GetPostUserId(postId int) (int, error) {
+	db := utils.GetDB()
+	var userId int
+	err := db.QueryRow("SELECT user_id FROM posts WHERE id =?", postId).Scan(&userId)
+	if err != nil {
+		return 0, err
+	}
+	return userId, nil
+}
+
+func DeletePost(postId int) error {
+	db := utils.GetDB()
+	_, err := db.Exec("DELETE FROM posts WHERE id =?", postId)
+	return err
 }

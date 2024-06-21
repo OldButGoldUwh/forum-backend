@@ -1,11 +1,10 @@
-// forum/models/comment.go
-
 package models
 
-type Comment struct {
+type Like struct {
 	ID        int    `json:"id"`
 	PostID    int    `json:"post_id"`
-	Content   string `json:"content"`
 	UserID    int    `json:"user_id"`
+	CommentID int    `json:"comment_id"`
+	Like      bool   `json:"like"`
 	CreatedAt string `json:"created_at"`
 }

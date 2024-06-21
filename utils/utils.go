@@ -5,14 +5,16 @@ package utils
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	_ "github.com/mattn/go-sqlite3" // Import the SQLite driver
 )
 
-var JwtKey = []byte("your_secret_key") // Replace with your actual secret key
+var JwtKey = []byte("83a20ef4d44757479d9a42cd034649f6e9227f8b466085bb49077a8ec9c4d5e4") // Replace with your actual secret key
 
 func GetToken(r *http.Request) string {
 	// Get the token from the request header
@@ -31,17 +33,22 @@ func GetToken(r *http.Request) string {
 
 func GetUserId(token string) (int, error) {
 	db := GetDB()
+
+	token = strings.TrimPrefix(token, "Bearer ")
+
 	if token == "" {
 		return 0, errors.New("token is empty")
 	}
 
 	claims := &jwt.StandardClaims{}
+
 	parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		return JwtKey, nil
 	})
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
+			fmt.Println("invalid token signature")
 			return 0, errors.New("invalid token signature")
 		}
 		return 0, err
@@ -53,6 +60,7 @@ func GetUserId(token string) (int, error) {
 
 	// Query the database to find the user associated with the token
 	var userId int
+
 	err = db.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -62,4 +70,8 @@ func GetUserId(token string) (int, error) {
 	}
 
 	return userId, nil
+}
+
+func GetCurrentTime() string {
+	return fmt.Sprintf("%d", time.Now().Unix())
 }
