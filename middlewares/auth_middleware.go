@@ -22,7 +22,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		fmt.Println("Token String:", tokenString)
 
 		// Check if the token is the guest token
 		if tokenString == guestToken {
