@@ -4,7 +4,6 @@ import (
 	"errors"
 	"forum-backend/models"
 	"forum-backend/utils"
-	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 
@@ -21,15 +20,15 @@ func CreateUser(user *models.User) error {
 		return err
 	}
 
-	time := time.Now().Unix()
+	//time := time.Now().Unix()
 
 	// Create the token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
 		"email":    user.Email,
-		"expaires": time + 3600,
+		//"expaires": time + 3600,
 		// TODO SESSİON KULLANILACAK
-		"iat": time,
+		//"iat": time,
 	})
 
 	// Sign the token with the secret key
@@ -62,7 +61,7 @@ func LoginUser(user *models.User) (string, error) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
 	if err != nil {
-		return "", errors.New("invalid username or password")
+		return "", errors.New("wrong password")
 	}
 
 	return dbUser.Token, nil
