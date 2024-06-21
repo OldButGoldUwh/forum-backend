@@ -1,33 +1,46 @@
 package controllers
 
 import (
-	"forum-backend/models"
+	"encoding/json"
 	"forum-backend/services"
+	"net/http"
 )
 
-func SearchUsers(username string) ([]models.User, error) {
+func SearchUsers(w http.ResponseWriter, r *http.Request) {
+	username := r.URL.Query().Get("username")
 	users, err := services.SearchUsers(username)
 	if err != nil {
-		return nil, err
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return users, nil
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+
 }
 
-func SearchPosts(title string) ([]models.Post, error) {
+func SearchPosts(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Query().Get("title")
 	posts, err := services.SearchPosts(title)
 	if err != nil {
-		return nil, err
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return posts, nil
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(posts)
+
 }
 
-func SearchComments(content string) ([]models.Comment, error) {
+func SearchComments(w http.ResponseWriter, r *http.Request) {
+	content := r.URL.Query().Get("content")
 	comments, err := services.SearchComments(content)
 	if err != nil {
-		return nil, err
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return comments, nil
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(comments)
+
 }

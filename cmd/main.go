@@ -28,6 +28,7 @@ func main() {
 	r.HandleFunc("/api/v1/users/{id}/likes", controllers.GetUserLikes).Methods("GET")
 	r.HandleFunc("/api/v1/users/{id}/dislikes", controllers.GetUserDislikes).Methods("GET")
 	r.HandleFunc("/api/v1/most-posted-user", controllers.MostPostedUser).Methods("GET")
+	r.HandleFunc("/api/v1/profile-data", controllers.ProfileData).Methods("GET")
 
 	// Comment
 	r.HandleFunc("/api/v1/posts/{id}/comments", controllers.CreateComment).Methods("POST")
@@ -57,6 +58,11 @@ func main() {
 	r.HandleFunc("/api/v1/likes", controllers.GetLikes).Methods("GET")
 	r.HandleFunc("/api/v1/likes", controllers.GetLikesForPost).Methods("GET")
 	r.HandleFunc("/api/v1/likes", controllers.GetLikesForComment).Methods("GET")
+
+	// Search
+	r.HandleFunc("/api/v1/search/users/{username}", controllers.SearchUsers).Methods("GET")
+	r.HandleFunc("/api/v1/search/posts/{title}", controllers.SearchPosts).Methods("GET")
+	r.HandleFunc("/api/v1/search/comments/{content}", controllers.SearchComments).Methods("GET")
 
 	// Middleware
 	r.Use(middlewares.AuthMiddleware)
