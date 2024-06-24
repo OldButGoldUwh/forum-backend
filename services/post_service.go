@@ -3,6 +3,7 @@
 package services
 
 import (
+	"fmt"
 	"forum-backend/models"
 	"forum-backend/utils"
 )
@@ -21,13 +22,14 @@ func CreatePost(post *models.Post, userId int) error {
 		}
 	}
 
-	_, err := db.Exec("INSERT INTO posts (title, content, user_id, categories,likes, dislikes, created_at, updated_at ) VALUES (?, ?, ?, ?,?,?,?,?)", post.Title, post.Content, userId, categories, 0, 0, post.CreatedAt, post.CreatedAt)
+	_, err := db.Exec("INSERT INTO posts (title, content, user_id, categories,likes, dislikes, comment_length, created_at, updated_at ) VALUES (?, ?, ?, ?,?,?,?,?,?)", post.Title, post.Content, userId, categories, 0, 0, 0, post.CreatedAt, post.CreatedAt)
+
 	return err
 }
 
 func GetPosts() ([]models.Post, error) {
 	db := utils.GetDB()
-	rows, err := db.Query("SELECT id, title, content, user_id FROM posts")
+	rows, err := db.Query("SELECT id, title, content, user_id, comment_length, likes, dislikes, updated_at, created_at FROM posts")
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +38,7 @@ func GetPosts() ([]models.Post, error) {
 	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
-		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID); err != nil {
+		if err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.CommentLength, &post.Likes, &post.Dislikes, &post.UpdatedAt, &post.CreatedAt); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)
@@ -47,6 +49,17 @@ func GetPosts() ([]models.Post, error) {
 func EditPost(post *models.Post) error {
 	db := utils.GetDB()
 	_, err := db.Exec("UPDATE posts SET title =?, content =?, updated_at =? WHERE id =?", post.Title, post.Content, utils.GetCurrentTime(), post.ID)
+	return err
+}
+
+func UpdatePostCommentLength(postId int) error {
+	db := utils.GetDB()
+	var CommentLength int
+	errS := db.QueryRow("SELECT COUNT(*) FROM comments WHERE post_id =?", postId).Scan(&CommentLength)
+	if errS != nil {
+		return errS
+	}
+	_, err := db.Exec("UPDATE posts SET  updated_at =?, comment_length =? WHERE id =?", utils.GetCurrentTime(), CommentLength+1, postId)
 	return err
 }
 
@@ -113,6 +126,7 @@ func UpdatePostUpdatedAt(postId int) error {
 	db := utils.GetDB()
 	currentTime := utils.GetCurrentTime()
 	_, err := db.Exec("UPDATE posts SET updated_at =? WHERE id =?", currentTime, postId)
+	fmt.Println("Updated at: ", currentTime)
 	return err
 
 }
@@ -155,4 +169,23 @@ func DeletePost(postId int) error {
 	db := utils.GetDB()
 	_, err := db.Exec("DELETE FROM posts WHERE id =?", postId)
 	return err
+}
+
+func GetPostComments(postId int) ([]models.Comment, error) {
+	db := utils.GetDB()
+	rows, err := db.Query("SELECT id, content, user_id FROM comments WHERE post_id =?", postId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []models.Comment
+	for rows.Next() {
+		var comment models.Comment
+		if err := rows.Scan(&comment.ID, &comment.Content, &comment.UserID); err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
+	}
+	return comments, nil
 }

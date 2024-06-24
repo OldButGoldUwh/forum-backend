@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -74,4 +75,14 @@ func GetUserId(token string) (int, error) {
 
 func GetCurrentTime() string {
 	return fmt.Sprintf("%d", time.Now().Unix())
+}
+
+func GetIdFromURL(url string) (int, error) {
+	parts := strings.Split(url, "/")
+	for _, part := range parts {
+		if id, err := strconv.Atoi(part); err == nil {
+			return id, nil
+		}
+	}
+	return 0, errors.New("ID not found in URL")
 }

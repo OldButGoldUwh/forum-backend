@@ -213,3 +213,14 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func MostCommentedPost(w http.ResponseWriter, r *http.Request) {
+	post, err := services.MostCommentedPost()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(post)
+}
