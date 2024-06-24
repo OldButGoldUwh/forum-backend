@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"forum-backend/models"
 	"forum-backend/services"
+	"forum-backend/utils"
 	"net/http"
 	"strconv"
 )
@@ -78,6 +79,23 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	user, err := services.GetUser(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
+func GetUserFromToken(w http.ResponseWriter, r *http.Request) {
+
+	token := r.Header.Get("Authorization")
+
+	userId, _ := utils.GetUserId(token)
+
+	user, err := services.GetUser(userId)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 

@@ -16,6 +16,7 @@ var secretKey = "83a20ef4d44757479d9a42cd034649f6e9227f8b466085bb49077a8ec9c4d5e
 
 func CreateUser(user *models.User) error {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+
 	if err != nil {
 		return err
 	}
@@ -33,6 +34,7 @@ func CreateUser(user *models.User) error {
 
 	// Sign the token with the secret key
 	tokenString, err := token.SignedString([]byte(secretKey))
+
 	// Sign the token with the secret key
 	if err != nil {
 		return err
@@ -56,11 +58,13 @@ func LoginUser(user *models.User) (string, error) {
 
 	err := db.QueryRow("SELECT id, username, email, password, token FROM users WHERE email =?", user.Email).Scan(&dbUser.ID, &dbUser.Username, &dbUser.Email, &dbUser.Password, &dbUser.Token)
 	if err != nil {
-		return "", err
+		return "O kullanıcı yok", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password))
+
 	if err != nil {
+
 		return "", errors.New("wrong password")
 	}
 

@@ -1,13 +1,15 @@
 package services
 
 import (
+	"fmt"
 	"forum-backend/models"
 	"forum-backend/utils"
 )
 
 func CreateLikeForPost(like *models.Like) error {
+	fmt.Println("SERVİCE Create like for post")
 	db := utils.GetDB()
-	_, err := db.Exec("INSERT INTO likes (post_id, user_id, created_at, like) VALUES (?, ?, ?)", like.PostID, like.UserID, like.CreatedAt, true)
+	_, err := db.Exec("INSERT INTO likes (post_id, user_id, created_at, like) VALUES (?, ?, ?, ?)", like.PostID, like.UserID, like.CreatedAt, true)
 	return err
 }
 

@@ -57,3 +57,13 @@ func UpdateComment(comment *models.Comment) error {
 	_, err := db.Exec("UPDATE comments SET content =? WHERE id =?", comment.Content, comment.ID)
 	return err
 }
+
+func MostCommentedPost() (int, error) {
+	db := utils.GetDB()
+	var postId int
+	err := db.QueryRow("SELECT post_id FROM comments GROUP BY post_id ORDER BY COUNT(post_id) DESC LIMIT 1").Scan(&postId)
+	if err != nil {
+		return 0, err
+	}
+	return postId, nil
+}

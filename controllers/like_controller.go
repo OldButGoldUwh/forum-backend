@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"forum-backend/models"
 	"forum-backend/services"
 	"forum-backend/utils"
@@ -9,7 +10,9 @@ import (
 )
 
 func CreateLikeForPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("CONTROLLER Create like for post")
 	var like models.Like
+
 	if err := json.NewDecoder(r.Body).Decode(&like); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -21,8 +24,16 @@ func CreateLikeForPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	postId, postIdErr := utils.GetIdFromURL(r.RequestURI)
+	if postIdErr != nil {
+		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		return
+	}
+
 	userId, _ := utils.GetUserId(token)
+
 	like.UserID = userId
+	like.PostID = postId
 
 	err := services.CreateLikeForPost(&like)
 	if err != nil {

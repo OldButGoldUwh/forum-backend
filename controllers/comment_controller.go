@@ -39,8 +39,16 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 	comment.UserID = userId
 
 	err = services.CreateComment(&comment)
-	services.UpdatePostUpdatedAt(postId)
 
+	services.UpdatePostCommentLength(postId)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Update post comment count
+	err = services.UpdatePostUpdatedAt(postId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
