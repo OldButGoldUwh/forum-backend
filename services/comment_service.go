@@ -27,7 +27,7 @@ func GetComments() ([]models.Comment, error) {
 
 	for rows.Next() {
 		var comment models.Comment
-		if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.UserID); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.UserID, &comment.CreatedAt); err != nil {
 			return nil, err
 		}
 		comments = append(comments, comment)

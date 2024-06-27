@@ -46,7 +46,7 @@ func main() {
 	r.HandleFunc("/api/v1/most-liked-posts", controllers.TenMostPopularPosts).Methods("GET")
 	r.HandleFunc("/api/v1/posts/{id}", controllers.EditPost).Methods("UPDATE")
 	r.HandleFunc("/api/v1/posts/{id}", controllers.DeletePost).Methods("DELETE")
-	r.HandleFunc("/api/v1/posts/most-commented-post", controllers.MostCommentedPost).Methods("GET")
+	r.HandleFunc("/api/v1/posts/most-comment", controllers.MostCommentedPost).Methods("GET")
 
 	// Like and dislike
 	r.HandleFunc("/api/v1/comments/like/{id}", controllers.CreateLikeForComment).Methods("POST")
