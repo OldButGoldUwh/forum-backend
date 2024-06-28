@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"forum-backend/models"
 	"forum-backend/utils"
 
@@ -101,6 +102,7 @@ func GetUser(id int) (models.User, error) {
 	var user models.User
 	err := db.QueryRow("SELECT id, username, email, password, token FROM users WHERE id =?", id).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Token)
 	if err != nil {
+		fmt.Println(err)
 		return user, err
 	}
 	return user, nil

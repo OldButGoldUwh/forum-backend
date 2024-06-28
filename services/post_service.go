@@ -22,7 +22,7 @@ func CreatePost(post *models.Post, userId int) error {
 		}
 	}
 
-	_, err := db.Exec("INSERT INTO posts (title, content, user_id, categories,likes, dislikes, comment_length, created_at, updated_at ) VALUES (?, ?, ?, ?,?,?,?,?,?)", post.Title, post.Content, userId, categories, 0, 0, 0, post.CreatedAt, post.CreatedAt)
+	_, err := db.Exec("INSERT INTO posts (title, content, user_id, categories,likes, dislikes, comment_length, created_at, updated_at ) VALUES (?, ?, ?, ?,?,?,?,?,?)", post.Title, post.Content, post.UserID, categories, 0, 0, 0, post.CreatedAt, post.CreatedAt)
 
 	return err
 }
@@ -66,7 +66,7 @@ func UpdatePostCommentLength(postId int) error {
 func GetPost(id int) (*models.Post, error) {
 	db := utils.GetDB()
 	var post models.Post
-	err := db.QueryRow("SELECT id, title, content, user_id FROM posts WHERE id = ?", id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID)
+	err := db.QueryRow(("Select id, title, content, user_id, created_at, updated_at FROM posts WHERE id =?"), id).Scan(&post.ID, &post.Title, &post.Content, &post.UserID, &post.CreatedAt, &post.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}

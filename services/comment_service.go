@@ -36,6 +36,29 @@ func GetComments() ([]models.Comment, error) {
 	return comments, nil
 }
 
+func GetCommentsForPost(postId int) ([]models.Comment, error) {
+	db := utils.GetDB()
+
+	rows, err := db.Query("SELECT * FROM comments WHERE post_id =?", postId)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []models.Comment
+
+	for rows.Next() {
+		var comment models.Comment
+		if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.UserID, &comment.CreatedAt); err != nil {
+			return nil, err
+		}
+		comments = append(comments, comment)
+	}
+
+	return comments, nil
+}
+
 func GetComment(id int) (*models.Comment, error) {
 	db := utils.GetDB()
 	var comment models.Comment

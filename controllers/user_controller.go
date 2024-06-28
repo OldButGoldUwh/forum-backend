@@ -4,11 +4,14 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"forum-backend/models"
 	"forum-backend/services"
 	"forum-backend/utils"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -73,11 +76,19 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	id, _ := strconv.Atoi(params.Get("id"))
+	// Extract the id from the URL path
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("id : ", id)
 
 	user, err := services.GetUser(id)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
@@ -85,7 +96,6 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(user)
 }
-
 func GetUserFromToken(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get("Authorization")

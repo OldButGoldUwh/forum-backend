@@ -59,7 +59,10 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
-	comments, err := services.GetComments()
+	params := mux.Vars(r)
+	postId, _ := strconv.Atoi(params["id"])
+
+	comments, err := services.GetCommentsForPost(postId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
